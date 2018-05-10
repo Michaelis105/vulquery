@@ -1,0 +1,27 @@
+<svg width="139" height="105" xmlns="http://www.w3.org/2000/svg">
+ <!-- Created with Method Draw - http://github.com/duopixel/Method-Draw/ -->
+ <defs>
+  <filter id="svg_1_blur">
+   <feGaussianBlur stdDeviation="0" in="SourceGraphic"/>
+  </filter>
+  <radialGradient r="0.5" cy="0.5" cx="0.5" spreadMethod="pad" id="svg_9">
+   <stop offset="0.28125" stop-color="#31868a"/>
+   <stop offset="0.78125" stop-color="#CE7975"/>
+  </radialGradient>
+ </defs>
+ <g>
+  <title>background</title>
+  <rect fill="#fff" id="canvas_background" height="107" width="141" y="-1" x="-1"/>
+  <g display="none" overflow="visible" y="0" x="0" height="100%" width="100%" id="canvasGrid">
+   <rect fill="url(#gridpattern)" stroke-width="0" y="0" x="0" height="100%" width="100%"/>
+  </g>
+ </g>
+ <g>
+  <title>Layer 1</title>
+  <text font-style="normal" filter="url(#svg_1_blur)" transform="matrix(2.9058, 0, 0, 2.95271, -182.422, -151.881)" font-weight="bold" xml:space="preserve" text-anchor="start" font-family="'Trebuchet MS', Gadget, sans-serif" font-size="24" id="svg_1" y="77.923112" x="70.18804" stroke-width="0" stroke="#000" fill="#000000">VQ</text>
+  <rect id="svg_2" height="73" width="190" y="-66.049988" x="-188.5" opacity="0.5" fill-opacity="null" stroke-opacity="null" stroke-width="0" stroke="#000" fill="#000000"/>
+  <rect fill-opacity="0.71" opacity="0.56" id="svg_3" height="172.999999" width="266.999991" y="-34" x="-63.999998" stroke-width="0" stroke="#000000" fill="url(#svg_9)"/>
+  <rect id="svg_4" height="1" width="41" y="99.950012" x="238.5" stroke-opacity="null" stroke-width="0" stroke="#000" fill="#000000"/>
+  <rect id="svg_5" height="0" width="1" y="20.950012" x="270.5" stroke-opacity="null" stroke-width="0" stroke="#000" fill="#000000"/>
+ </g>
+</svg>
