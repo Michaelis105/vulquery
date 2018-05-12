@@ -1,95 +1,67 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
+
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>VulQuery</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.8/angular-material.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic">
     <link rel="stylesheet" href="css/vulquery.css">
 </head>
-<body>
-    <div>
-        <nav class="navbar navbar-dark bg-dark">
-            <a class="navbar-brand" href="#">
-                <img src="img/vqlogo.svg" width="30" height="30" class="d-inline-block align-top" alt="">
-            </a>
-            <form class="form-inline my-0 my-lg-0">
-                <input class="form-control mr-sm-2" type="search" placeholder="Group ID" aria-label="GroupID">
-                <input class="form-control mr-sm-2" type="search" placeholder="Artifact ID" aria-label="ArtifactID">
-                <input class="form-control mr-sm-2" type="search" placeholder="Version" aria-label="Version">
-                <button class="btn my-2 my-sm-0" type="submit">Search</button>
-                <button class="btn my-2 my-sm-0" type="clear">Clear</button>
-            </form>
-        </nav>
-    </div>
-    <div>
-        <div class="progress">
-            <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
-        </div>
-        <table class="table table-hover">
-            <thead>
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Dependency Name</th>
-                    <th scope="col">Version</th>
-                    <th scope="col">CVSS Score</th>
-                    <th scope="col">Lows</th>
-                    <th scope="col">Mediums</th>
-                    <th scope="col">Highs</th>
-                    <th scope="col">Criticals</th>
-                </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <th scope="row">1</th>
-                <td>JDK</td>
-                <td>1.7.2</td>
-                <td>1</td>
-                <td>2</td>
-                <td>3</td>
-                <td>4</td>
-                <td>5</td>
-            </tr>
-            <tr>
-                <th scope="row">2</th>
-                <td>JDK</td>
-                <td>1.7.2</td>
-                <td>1</td>
-                <td>2</td>
-                <td>3</td>
-                <td>4</td>
-                <td>5</td>
-            </tr>
-            <tr>
-                <th scope="row">3</th>
-                <td>JDK</td>
-                <td>1.7.2</td>
-                <td>1</td>
-                <td>2</td>
-                <td>3</td>
-                <td>4</td>
-                <td>5</td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
+<body ng-app="BlankApp" ng-cloak>
+<div layout="column" ng-cloak> <!--ng-controller="BasicDemoCtrl"-->
+    <md-sidenav
+            class="md-sidenav-left"
+            md-component-id="left"
+            md-is-locked-open="$mdMedia('gt-md')"
+            md-whiteframe="4">
 
-    <div>
+        <md-toolbar class="md-theme-indigo">
+            <h1 class="md-toolbar-tools">VulQuery</h1>
+        </md-toolbar>
+        <md-content ng-controller="LeftCtrl" layout-align="center center" layout-padding>
+            <div layout-align="center end">
+                <md-input-container>
+                    <label>Group ID</label>
+                    <input required ng-model="dependency.groupId">
+                </md-input-container>
 
-    </div>
+                <md-input-container>
+                    <label>Artifact ID</label>
+                    <input required ng-model="dependency.artifactId">
+                </md-input-container>
 
-    <nav class="navbar navbar-dark bg-dark fixed-bottom">
-        <footer>
-            <div class="container">
-                <a href="#" class="btn btn-primary" role="button" aria-disabled="true">About VulQuery</a>
-                <a href="#" class="btn btn-primary" role="button" aria-disabled="true">Contribute</a>
+                <md-input-container>
+                    <label>Version</label>
+                    <input ng-model="dependency.version">
+                </md-input-container>
             </div>
-        </footer>
-    </nav>
 
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+            <md-button class="md-raised md-primary">Search</md-button>
+            <md-button class="md-raised md-primary">Clear</md-button>
+        </md-content>
+    </md-sidenav>
+    <md-button class="md-fab" aria-label="Menu">
+        <ng-md-icon icon="menu"></ng-md-icon>
+    </md-button>
+
+
+    <div ng-view></div>
+
+    <footer layout-align="end end">
+        <a href="">About</a>
+        <a href="">Contribute</a>
+    </footer>
+
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-animate.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-aria.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-messages.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.8/angular-material.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-material-icons/0.7.1/angular-material-icons.min.js"></script>
+<script src="js/vulquery.js"></script>
+
 </body>
 </html>

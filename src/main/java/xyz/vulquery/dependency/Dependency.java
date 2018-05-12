@@ -32,6 +32,7 @@ public class Dependency {
         return version;
     }
 
+    @Override
     public String toString() {
         return "Dependency [ groupId: " + groupId + ", artifactId: " + artifactId + ", version: " + version + " ]";
     }
