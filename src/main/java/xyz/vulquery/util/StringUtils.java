@@ -1,6 +1,6 @@
 package xyz.vulquery.util;
 
-public class Utils {
+public class StringUtils {
 
     /**
      * Borrowed from org.apache.commons:commons-lang3
