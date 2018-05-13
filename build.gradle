@@ -16,5 +16,6 @@ dependencies {
     compile 'org.slf4j:slf4j-api:1.7.25'
     compile 'commons-io:commons-io:2.6'
     compile 'com.google.code.gson:gson:2.8.4'
+    compile 'org.xerial:sqlite-jdbc:3.21.0.1'
     testCompile 'junit:junit:4.12'
 }
