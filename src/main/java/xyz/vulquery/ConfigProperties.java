@@ -6,27 +6,27 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties(prefix = "vq")
 public class ConfigProperties {
-    private String dbpath;
-    private String datafeedpath;
+    private String dbPath;
+    private String dataFeedPath;
 
     @Override
     public String toString() {
-        return "ConfigProperties [ dbpath=" + dbpath +  " , datafeedpath=" + datafeedpath + " ]";
+        return "ConfigProperties [ dbpath=" + dbPath +  " , datafeedpath=" + dataFeedPath + " ]";
     }
 
-    public void setDbpath(String dbpath) {
-        this.dbpath = dbpath;
+    public void setDbPath(String dbpath) {
+        this.dbPath = dbpath;
     }
 
     public String getDbpath() {
-        return dbpath;
+        return dbPath;
     }
 
-    public void setDatafeedpath(String datafeedpath) {
-        this.datafeedpath = datafeedpath;
+    public void setDataFeedPath(String dataFeedPath) {
+        this.dataFeedPath = dataFeedPath;
     }
 
-    public String getDatafeedpath() {
-        return datafeedpath;
+    public String getDataFeedPath() {
+        return dataFeedPath;
     }
 }
