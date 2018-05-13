@@ -1,17 +1,21 @@
 package xyz.vulquery;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import xyz.vulquery.datafeed.DatafeedController;
+import xyz.vulquery.datafeed.DatafeedService;
 
 /**
  * Handles web requests to endpoints
  */
 @Controller
 public class BaseController {
+
+    private static final Logger logger = LoggerFactory.getLogger(BaseController.class);
 
     String homePageFileName = "index.html";
 
@@ -35,7 +39,7 @@ public class BaseController {
     public String processDependency(@RequestParam(name = "groupid") String groupId,
                                     @RequestParam(name = "artifactid") String artifactId,
                                     @RequestParam(name = "version", required = false) String version) {
-        return DatafeedController.getDependency(groupId, artifactId, version);
+        return DatafeedService.getDependency(groupId, artifactId, version);
     }
 
     /**
@@ -43,6 +47,14 @@ public class BaseController {
      */
     @GetMapping(value = "/lastSyncDate", produces = "application/json")
     public String lastSyncDate() {
-        return DatafeedController.getLastSyncDate();
+        return DatafeedService.getLastSyncDate();
+    }
+
+    /**
+     * @return Pong
+     */
+    @GetMapping(value = "/ping", produces = "application/json")
+    public String ping() {
+        return DatafeedService.ping();
     }
 }
