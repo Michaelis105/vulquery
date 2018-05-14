@@ -14,11 +14,11 @@ public class ConfigProperties {
         return "ConfigProperties [ dbpath=" + dbPath +  " , datafeedpath=" + dataFeedPath + " ]";
     }
 
-    public void setDbPath(String dbpath) {
-        this.dbPath = dbpath;
+    public void setDbPath(String dbPath) {
+        this.dbPath = dbPath;
     }
 
-    public String getDbpath() {
+    public String getDbPath() {
         return dbPath;
     }
 

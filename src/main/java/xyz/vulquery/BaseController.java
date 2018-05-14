@@ -2,6 +2,7 @@ package xyz.vulquery;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +18,9 @@ public class BaseController {
 
     private static final Logger logger = LoggerFactory.getLogger(BaseController.class);
 
+    @Autowired
+    private DatafeedService dataFeedService;
+
     String homePageFileName = "index.html";
 
     /**
@@ -29,7 +33,6 @@ public class BaseController {
 
     /**
      * Obtains all vulnerability information pertaining to dependency.
-     *
      * @param groupId project name
      * @param artifactId name of jar
      * @param version version of jar
@@ -39,7 +42,7 @@ public class BaseController {
     public String processDependency(@RequestParam(name = "groupid") String groupId,
                                     @RequestParam(name = "artifactid") String artifactId,
                                     @RequestParam(name = "version", required = false) String version) {
-        return DatafeedService.getDependency(groupId, artifactId, version);
+        return dataFeedService.getDependency(groupId, artifactId, version);
     }
 
     /**
@@ -47,7 +50,7 @@ public class BaseController {
      */
     @GetMapping(value = "/lastSyncDate", produces = "application/json")
     public String lastSyncDate() {
-        return DatafeedService.getLastSyncDate();
+        return dataFeedService.getLastSyncDate();
     }
 
     /**
@@ -55,6 +58,6 @@ public class BaseController {
      */
     @GetMapping(value = "/ping", produces = "application/json")
     public String ping() {
-        return DatafeedService.ping();
+        return dataFeedService.ping();
     }
 }

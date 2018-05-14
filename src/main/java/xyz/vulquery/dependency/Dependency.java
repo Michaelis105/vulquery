@@ -1,4 +1,4 @@
-package xyz.vulquery.datafeed;
+package xyz.vulquery.dependency;
 
 public class Dependency {
 
