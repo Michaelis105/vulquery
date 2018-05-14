@@ -31,8 +31,8 @@ public class Application {
     @PostConstruct
     private void init() throws Exception {
         String defaultPath = Application.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
-        initDataStore(StringUtils.isBlank(prop.getDbpath()) ? defaultPath : prop.getDbpath());
-        initDataFeedDownloadDirectory(StringUtils.isBlank(prop.getDataFeedPath()) ? defaultPath : prop.getDbpath());
+        initDataStore(StringUtils.isBlank(prop.getDbPath()) ? defaultPath : prop.getDbPath());
+        initDataFeedDownloadDirectory(StringUtils.isBlank(prop.getDataFeedPath()) ? defaultPath : prop.getDataFeedPath());
     }
 
     /**
@@ -52,14 +52,13 @@ public class Application {
         logger.debug("SQLITE URL: " + urlSB.toString());
 
         // TODO: Not final table
-        String sql = "CREATE TABLE DEPENDENCY " +
+        String sql = "CREATE TABLE IF NOT EXISTS DEPENDENCY " +
                 "(GROUPID       TEXT    NOT NULL, " +
                 " ARTIFACTID    TEXT    NOT NULL, " +
                 " VERSION       TEXT    NOT NULL)";
 
         try (Connection connection = DriverManager.getConnection(urlSB.toString());
-             Statement statement = connection.createStatement()
-        ) {
+             Statement statement = connection.createStatement()) {
             statement.executeUpdate(sql);
         }
 
