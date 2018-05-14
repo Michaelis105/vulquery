@@ -15,6 +15,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import org.springframework.boot.system.ApplicationHome;
 import xyz.vulquery.util.StringUtils;
 
 /**
@@ -33,7 +34,8 @@ public class Application {
      */
     @PostConstruct
     private void init() throws Exception {
-        String defaultPath = Application.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
+        String defaultPath = new ApplicationHome(Application.class).getDir().getAbsolutePath();
+        logger.info(defaultPath);
         initDataStore(StringUtils.isBlank(prop.getDbPath()) ? defaultPath : prop.getDbPath());
         initDataFeedDownloadDirectory(StringUtils.isBlank(prop.getDataFeedPath()) ? defaultPath : prop.getDataFeedPath());
     }
@@ -45,13 +47,17 @@ public class Application {
      * @throws SQLException connection error to database
      */
     private void initDataStore(String url) throws ClassNotFoundException, SQLException {
+        if (StringUtils.isBlank(url)) {
+            throw new IllegalArgumentException("Database URL is null or empty.");
+        }
+
         Class.forName("org.sqlite.JDBC");
         StringBuffer urlSB = new StringBuffer();
 
         urlSB.append("jdbc:sqlite:");
         urlSB.append(url);
-        urlSB.append("vulquery.db");
-        
+        urlSB.append("/vulquery.db");
+
         logger.debug("SQLITE URL: " + urlSB.toString());
 
         // TODO: Not final table
@@ -72,6 +78,9 @@ public class Application {
      * @param path Absolute file path where download directory will be stored
      */
     private void initDataFeedDownloadDirectory(String path) throws IOException {
+        if (StringUtils.isBlank(path)) {
+            throw new IllegalArgumentException("Download directory path is null or empty.");
+        }
         logger.debug("Download directory: " + path);
         File downloadDir = new File(path);
         if (!downloadDir.exists()) {
