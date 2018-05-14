@@ -17,10 +17,13 @@ import java.sql.Statement;
 
 import xyz.vulquery.util.StringUtils;
 
+/**
+ * Starting point for initialization
+ */
 @SpringBootApplication
 public class Application {
 
-    private static final Logger logger = LoggerFactory.getLogger(Application.class);
+    private final Logger logger = LoggerFactory.getLogger(Application.class);
 
     @Autowired
     private ConfigProperties prop;
@@ -48,7 +51,7 @@ public class Application {
         urlSB.append("jdbc:sqlite:");
         urlSB.append(url);
         urlSB.append("vulquery.db");
-
+        
         logger.debug("SQLITE URL: " + urlSB.toString());
 
         // TODO: Not final table

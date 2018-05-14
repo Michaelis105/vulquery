@@ -7,8 +7,6 @@ import org.springframework.stereotype.Component;
 
 import com.google.gson.Gson;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 import xyz.vulquery.dao.DependencyDAO;
 import xyz.vulquery.dependency.Dependency;
 import xyz.vulquery.util.HTTPResponseUtil;
@@ -25,7 +23,7 @@ import java.util.List;
 @Component("dataFeedService")
 public class DatafeedService {
 
-    private static final Logger logger = LoggerFactory.getLogger(DatafeedService.class);
+    private final Logger logger = LoggerFactory.getLogger(DatafeedService.class);
 
     @Autowired
     private DependencyDAO dependencyDAO;
@@ -78,7 +76,7 @@ public class DatafeedService {
         //Gson gson = new Gson();
         //return gson.toJson(d);
 
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -118,7 +116,7 @@ public class DatafeedService {
         //dependencyDAO.addDependency();
 
         dependencyDAO.updateSyncDate(new Timestamp(new Date().getTime()));
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -147,7 +145,7 @@ public class DatafeedService {
         }
 
         dependencyDAO.updateSyncDate(new Timestamp(new Date().getTime()));
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
 }

@@ -1,6 +1,5 @@
 package xyz.vulquery.datafeed;
 
-import com.sun.javaws.exceptions.InvalidArgumentException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +21,7 @@ import java.util.List;
 @Component("downloader")
 public class Downloader {
 
-    private static final Logger logger = LoggerFactory.getLogger(Downloader.class);
+    private final Logger logger = LoggerFactory.getLogger(Downloader.class);
 
     @Autowired
     private ConfigProperties prop;
@@ -60,8 +59,6 @@ public class Downloader {
         for (int year = EARLIEST_FEED_YEAR; year <= LATEST_FEED_YEAR; year++) {
             try {
                 filePaths.add(downloadSpecific(year));
-            } catch (InvalidArgumentException e) {
-                // TODO: Skip over year, log error
             } catch (MalformedURLException e) {
                 // TODO: Skip over year, log error
             } catch (IOException e) {
@@ -74,9 +71,9 @@ public class Downloader {
     /**
      * Downloads specific data feed file by year.
      */
-    public String downloadSpecific(int year) throws InvalidArgumentException, IOException {
+    public String downloadSpecific(int year) throws IOException {
         if (year < EARLIEST_FEED_YEAR && year > LATEST_FEED_YEAR) {
-            throw new InvalidArgumentException(new String[]{"Year " + year + " is out of range. Please specify year between " + EARLIEST_FEED_YEAR + " and " + LATEST_FEED_YEAR});
+            throw new IllegalArgumentException("Year " + year + " is out of range. Please specify year between " + EARLIEST_FEED_YEAR + " and " + LATEST_FEED_YEAR);
         }
 
         StringBuffer urlSB = new StringBuffer();

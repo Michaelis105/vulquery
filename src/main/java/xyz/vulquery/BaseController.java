@@ -16,7 +16,7 @@ import xyz.vulquery.datafeed.DatafeedService;
 @Controller
 public class BaseController {
 
-    private static final Logger logger = LoggerFactory.getLogger(BaseController.class);
+    private final Logger logger = LoggerFactory.getLogger(BaseController.class);
 
     @Autowired
     private DatafeedService dataFeedService;

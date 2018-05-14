@@ -3,6 +3,9 @@ package xyz.vulquery;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Handles all environment configuration
+ */
 @Configuration
 @ConfigurationProperties(prefix = "vq")
 public class ConfigProperties {

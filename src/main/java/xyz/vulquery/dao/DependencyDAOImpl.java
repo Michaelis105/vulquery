@@ -13,7 +13,7 @@ import java.util.List;
 @Component("dependencyDAO")
 public class DependencyDAOImpl implements DependencyDAO {
 
-    private static final Logger logger = LoggerFactory.getLogger(DependencyDAOImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(DependencyDAOImpl.class);
 
     /**
      * Adds dependency to database. If it already exists, then update.
