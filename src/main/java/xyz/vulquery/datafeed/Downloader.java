@@ -1,18 +1,32 @@
 package xyz.vulquery.datafeed;
 
 import com.sun.javaws.exceptions.InvalidArgumentException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import org.apache.commons.io.FileUtils;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import xyz.vulquery.ConfigProperties;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
- * Handles downloading of all dependency-vulnerability files from some data feed source.
- * Data feed is standardized to NVD NIST GOV.
+ * Handles downloading of all dependency-vulnerability files from some data feed source (NVD NIST GOV).
  */
+@Component("downloader")
 public class Downloader {
+
+    private static final Logger logger = LoggerFactory.getLogger(Downloader.class);
+
+    @Autowired
+    private ConfigProperties prop;
+
     private static final String DATAFEED_URL_ROOT = "https://static.nvd.nist.gov/feeds/xml/cve/2.0/nvdcve-2.0-";
     private static final int EARLIEST_FEED_YEAR = 2002;
     private static final int LATEST_FEED_YEAR = 2018;
@@ -26,36 +40,41 @@ public class Downloader {
     /**
      * Downloads latest modified/incremental data feed file.
      */
-    public void downloadLatest() {
+    public String downloadLatest() {
+
+        String filePath = prop.getDataFeedPath()+ "modified";
         try {
-            FileUtils.copyURLToFile(new URL(DATAFEED_URL_MODIFIED), new File(""));
+            FileUtils.copyURLToFile(new URL(DATAFEED_URL_MODIFIED), new File(filePath));
         } catch (IOException e) {
             //e.printStackTrace();
         }
-
-        throw new NotImplementedException();
+        return filePath;
     }
 
     /**
      * Downloads all data feed files.
      */
-    public void downloadAll() {
+    public List<String> downloadAll() {
+        List<String> filePaths = new LinkedList<>();
+
         for (int year = EARLIEST_FEED_YEAR; year <= LATEST_FEED_YEAR; year++) {
             try {
-                downloadSpecific(year);
+                filePaths.add(downloadSpecific(year));
             } catch (InvalidArgumentException e) {
                 // TODO: Skip over year, log error
-                //e.printStackTrace();
+            } catch (MalformedURLException e) {
+                // TODO: Skip over year, log error
+            } catch (IOException e) {
+                // TODO: Skip over year, log error
             }
         }
-
-        throw new NotImplementedException();
+        return filePaths;
     }
 
     /**
      * Downloads specific data feed file by year.
      */
-    public void downloadSpecific(int year) throws InvalidArgumentException {
+    public String downloadSpecific(int year) throws InvalidArgumentException, IOException {
         if (year < EARLIEST_FEED_YEAR && year > LATEST_FEED_YEAR) {
             throw new InvalidArgumentException(new String[]{"Year " + year + " is out of range. Please specify year between " + EARLIEST_FEED_YEAR + " and " + LATEST_FEED_YEAR});
         }
@@ -65,12 +84,9 @@ public class Downloader {
         urlSB.append(year);
         urlSB.append(EXT_JSON);
 
-        try {
-            FileUtils.copyURLToFile(new URL(urlSB.toString()), new File(""));
-        } catch (IOException e) {
-            //e.printStackTrace();
-        }
+        String filePath = prop.getDataFeedPath()+ NVD_JSON_PREFIX + year + EXT_JSON;
+        FileUtils.copyURLToFile(new URL(urlSB.toString()), new File(filePath));
 
-        throw new NotImplementedException();
+        return filePath;
     }
 }
