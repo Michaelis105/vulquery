@@ -133,7 +133,7 @@ public class DatafeedService {
      * Updates dependency-vulnerability info with all
      */
     public void fullSync() {
-        List<String> filePaths = downloader.downloadAll();
+        List<String> filePaths = downloader.downloadAndExtractAll();
         if (filePaths == null) {
             // TODO: Throw error/exception
         } else if (filePaths.size() == 0) {

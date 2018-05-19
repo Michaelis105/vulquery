@@ -8,12 +8,13 @@ import org.slf4j.LoggerFactory;
 
 import xyz.vulquery.util.StringUtils;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 /**
  * Handles downloading of all dependency-vulnerability files from some data feed source (NVD NIST GOV).
@@ -28,8 +29,11 @@ public class Downloader {
     private static final int LATEST_FEED_YEAR = 2018; // TODO: Make this maximum dynamic.
 
     private static final String NVD_JSON_PREFIX = "nvdcve-1.0-";
-    private static final String EXT_JSON = ".json.zip";
+    private static final String EXT_JSON = ".json";
+    private static final String EXT_JSON_ZIP = ".json.zip";
     private static final String EXT_META = ".meta";
+
+    private static final String DATAFEED_DIRECTORY_NAME = "datafeed";
 
     private static final String DATAFEED_URL_MODIFIED = DATAFEED_URL_ROOT + "modified" + EXT_META;
 
@@ -40,7 +44,7 @@ public class Downloader {
             throw new IllegalArgumentException("Download directory path is null or empty.");
         }
 
-        path += File.separator + "datafeed";
+        path += File.separator + DATAFEED_DIRECTORY_NAME;
 
         logger.debug("Download directory: " + path);
         File downloadDir = new File(path);
@@ -84,21 +88,26 @@ public class Downloader {
 
     /**
      * Downloads all data feed files.
-     *
-     * Total feed size is about 50 MB as of 05/19/2018.
-     *
-     * @return list of paths where data feed files were downloaded
+     * Total feed size is about 50 MB compressed, 1 GB uncompressed as of 05/19/2018
+     * @return list of paths where data feed files were downloaded and extracted
      */
-    public List<String> downloadAll() {
+    public List<String> downloadAndExtractAll() {
         List<String> filePaths = new LinkedList<>();
         logger.debug("Downloading all data feed files...");
+
+        // TODO: Use multithreading to download and extract files.
         for (int year = EARLIEST_FEED_YEAR; year <= LATEST_FEED_YEAR; year++) {
             try {
-                filePaths.add(downloadSpecific(year));
+                String zipPath = downloadSpecific(year);
+                File zipPathFile = new File(zipPath);
+                filePaths.add(extractSpecific(zipPath));
+                if (!zipPathFile.delete()) {
+                    logger.warn("Failed to clean up zip data feed file at " + zipPathFile.getCanonicalPath());
+                }
             } catch (MalformedURLException e) {
                 logger.error("Incorrect URL formed for year " + year);
             } catch (IOException e) {
-                logger.error("Failed to download data feed file for year " + year);
+                logger.error("Failed to download or extract data feed file for year " + year);
             }
         }
         return filePaths;
@@ -110,7 +119,7 @@ public class Downloader {
      */
     public String downloadSpecific(int year) throws IOException {
 
-        logger.debug("Downloading data feed files year: " + year);
+        logger.debug("Downloading data feed file year: " + year);
 
         if (year < EARLIEST_FEED_YEAR && year > LATEST_FEED_YEAR) {
             throw new IllegalArgumentException("Year " + year + " is out of range. Please specify year between " + EARLIEST_FEED_YEAR + " and " + LATEST_FEED_YEAR);
@@ -119,11 +128,11 @@ public class Downloader {
         StringBuffer urlSB = new StringBuffer();
         urlSB.append(DATAFEED_URL_ROOT);
         urlSB.append(year);
-        urlSB.append(EXT_JSON);
+        urlSB.append(EXT_JSON_ZIP);
 
-        String filePath = DOWNLOAD_PATH + File.separator + NVD_JSON_PREFIX + year + EXT_JSON;
+        String filePath = DOWNLOAD_PATH + File.separator + NVD_JSON_PREFIX + year + EXT_JSON_ZIP;
 
-        logger.debug("Downloading year " + year + " data feed file... from URL " + urlSB.toString() + " to file path " + filePath);
+        logger.debug("Downloading year " + year + " data feed file from URL " + urlSB.toString() + " to file path " + filePath);
 
         // Baseline data feed.
         File file = new File(filePath);
@@ -132,8 +141,49 @@ public class Downloader {
             file.delete();
         }
 
-        FileUtils.copyURLToFile(new URL(urlSB.toString()), file);
+        try {
+            FileUtils.copyURLToFile(new URL(urlSB.toString()), file);
+        } catch (IOException e) {
+            logger.error("Error downloading year " + year + " data feed file from URL " + urlSB.toString() + " to file path " + filePath);
+            throw new IOException(e);
+        }
 
         return filePath;
+    }
+
+    public String extractSpecific(String filePathYear) {
+
+        logger.debug("Extracting data feed file: " + filePathYear);
+
+        if (StringUtils.isBlank(filePathYear)) {
+            throw new IllegalArgumentException("File path year of data feed was blank or null.");
+        }
+
+        byte[] buffer = new byte[1024];
+
+        try (ZipInputStream zis = new ZipInputStream((new FileInputStream(filePathYear)))) {
+            ZipEntry zipEntry;
+            while ((zipEntry = zis.getNextEntry()) != null) {
+
+                String extractedFilePath = DATAFEED_DIRECTORY_NAME + File.separator + zipEntry.getName();
+
+                // Zip file should only have one files contained.
+                File f = new File(extractedFilePath);
+                try (FileOutputStream fos = new FileOutputStream(f)) {
+                    int length;
+                    while ((length = zis.read(buffer)) > 0) {
+                        fos.write(buffer, 0, length);
+                    }
+                    fos.close();
+                    return f.getCanonicalPath();
+                }
+            }
+        } catch (IOException e) {
+            logger.error("Error extracting data feed file path " + filePathYear);
+        }
+
+        // Path to single file in zip file should have already been returned. Should not be here.
+        // Change this if/when multiple files extracted, then return parent directory path.
+        return "";
     }
 }
