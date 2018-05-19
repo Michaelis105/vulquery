@@ -2,6 +2,8 @@ package xyz.vulquery.dao;
 
 import xyz.vulquery.dependency.Dependency;
 
+import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 
@@ -39,6 +41,10 @@ public interface DependencyDAO {
      * Retrives last sync date to data storage.
      * @return sync date
      */
-    Date getSyncDate();
+    String getSyncDate();
 
+    /**
+     * Start up initialization of data storage.
+     */
+    void init(String url); // TODO: Should DAO handle db initialization?
 }

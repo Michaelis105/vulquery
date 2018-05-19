@@ -10,12 +10,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 import org.springframework.boot.system.ApplicationHome;
+import xyz.vulquery.dao.DependencyDAO;
+import xyz.vulquery.datafeed.DatafeedService;
 import xyz.vulquery.util.StringUtils;
 
 /**
@@ -29,6 +28,12 @@ public class Application {
     @Autowired
     private ConfigProperties prop;
 
+    @Autowired
+    private DatafeedService dataFeedService; // Use for initialization only.
+
+    @Autowired
+    private DependencyDAO dependencyDAO; // Use for initialization only.
+
     /**
      * Continue initialization after SpringBoot has started.
      */
@@ -38,6 +43,7 @@ public class Application {
         logger.info(defaultPath);
         initDataStore(StringUtils.isBlank(prop.getDbPath()) ? defaultPath : prop.getDbPath());
         initDataFeedDownloadDirectory(StringUtils.isBlank(prop.getDataFeedPath()) ? defaultPath : prop.getDataFeedPath());
+        dataFeedService.fullSync();
     }
 
     /**
@@ -47,30 +53,7 @@ public class Application {
      * @throws SQLException connection error to database
      */
     private void initDataStore(String url) throws ClassNotFoundException, SQLException {
-        if (StringUtils.isBlank(url)) {
-            throw new IllegalArgumentException("Database URL is null or empty.");
-        }
-
-        Class.forName("org.sqlite.JDBC");
-        StringBuffer urlSB = new StringBuffer();
-
-        urlSB.append("jdbc:sqlite:");
-        urlSB.append(url);
-        urlSB.append("/vulquery.db");
-
-        logger.debug("SQLITE URL: " + urlSB.toString());
-
-        // TODO: Not final table
-        String sql = "CREATE TABLE IF NOT EXISTS DEPENDENCY " +
-                "(GROUPID       TEXT    NOT NULL, " +
-                " ARTIFACTID    TEXT    NOT NULL, " +
-                " VERSION       TEXT    NOT NULL)";
-
-        try (Connection connection = DriverManager.getConnection(urlSB.toString());
-             Statement statement = connection.createStatement()) {
-            statement.executeUpdate(sql);
-        }
-
+        dependencyDAO.init(url);
     }
 
     /**

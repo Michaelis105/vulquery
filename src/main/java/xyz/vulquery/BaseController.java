@@ -3,11 +3,13 @@ package xyz.vulquery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import org.springframework.web.bind.annotation.ResponseBody;
 import xyz.vulquery.datafeed.DatafeedService;
 
 /**
@@ -38,7 +40,8 @@ public class BaseController {
      * @param version version of jar
      * @return Dependency and vulnerability related info
      */
-    @GetMapping(value = "/dep", produces = "application/json")
+    @GetMapping(value = "/dep", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @ResponseBody
     public String processDependency(@RequestParam(name = "groupid") String groupId,
                                     @RequestParam(name = "artifactid") String artifactId,
                                     @RequestParam(name = "version", required = false) String version) {
@@ -48,7 +51,8 @@ public class BaseController {
     /**
      * @return Last date of dependency data feed sync.
      */
-    @GetMapping(value = "/lastSyncDate", produces = "application/json")
+    @GetMapping(value = "/lastSyncDate", produces = {MediaType.APPLICATION_JSON_VALUE} )
+    @ResponseBody
     public String lastSyncDate() {
         return dataFeedService.getLastSyncDate();
     }
@@ -56,7 +60,8 @@ public class BaseController {
     /**
      * @return Pong
      */
-    @GetMapping(value = "/ping", produces = "application/json")
+    @GetMapping(value = "/ping", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @ResponseBody
     public String ping() {
         return dataFeedService.ping();
     }

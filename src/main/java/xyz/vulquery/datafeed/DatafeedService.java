@@ -12,7 +12,9 @@ import xyz.vulquery.dependency.Dependency;
 import xyz.vulquery.util.HTTPResponseUtil;
 import xyz.vulquery.util.StringUtils;
 
+import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -84,7 +86,7 @@ public class DatafeedService {
      * @return date of last dependency-vulnerability
      */
     public String getLastSyncDate() {
-        return new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(dependencyDAO.getSyncDate());
+        return HTTPResponseUtil.createJSONMessage(dependencyDAO.getSyncDate());
     }
 
     /**
@@ -115,8 +117,7 @@ public class DatafeedService {
         // TODO: Pass file path to parser, then return a (deserialized) dependency object.
         //dependencyDAO.addDependency();
 
-        dependencyDAO.updateSyncDate(new Timestamp(new Date().getTime()));
-        throw new UnsupportedOperationException();
+        dependencyDAO.updateSyncDate(new Date());
     }
 
     /**
@@ -144,8 +145,7 @@ public class DatafeedService {
             //dependencyDAO.addDependency();
         }
 
-        dependencyDAO.updateSyncDate(new Timestamp(new Date().getTime()));
-        throw new UnsupportedOperationException();
+        dependencyDAO.updateSyncDate(new Date());
     }
 
 }
