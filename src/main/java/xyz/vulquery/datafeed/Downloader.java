@@ -63,33 +63,33 @@ public class Downloader {
     }
 
     /**
-     * Downloads latest modified/incremental data feed file.
-     * @return path where data feed file was downloaded
+     * Downloads and extracts latest modified/incremental data feed file.
+     * @return path of extracted data feed file
      */
-    public String downloadLatest() {
+    public String downloadAndExtractLatest() throws IOException {
+        logger.debug("Downloading latest data feed file...");
         String filePath = DOWNLOAD_PATH + File.separator + "modified";
-
-        logger.debug("Modified file download path: " + filePath);
+        logger.debug("Modified data feed file download path: " + filePath);
 
         // Ensure using latest modified file by base-lining staging modified feed.
         File modifiedFile = new File(filePath);
         if (modifiedFile.exists()) {
-            logger.debug("Modified file exists, deleting..." + filePath);
+            logger.debug("Modified data feed file exists, deleting..." + filePath);
             modifiedFile.delete();
         }
 
-        try {
-            FileUtils.copyURLToFile(new URL(DATAFEED_URL_MODIFIED), modifiedFile);
-        } catch (IOException e) {
-            logger.error("Error downloading modified file feed at path: " + filePath);
+        FileUtils.copyURLToFile(new URL(DATAFEED_URL_MODIFIED), modifiedFile);
+        String metaExtractFilePath = extractSpecific(modifiedFile.getCanonicalPath());
+        if (!modifiedFile.delete()) {
+            logger.warn("Failed to clean up zip data feed file at " + modifiedFile.getCanonicalPath());
         }
-        return filePath;
+        return metaExtractFilePath;
     }
 
     /**
-     * Downloads all data feed files.
+     * Downloads and extracts all data feed files.
      * Total feed size is about 50 MB compressed, 1 GB uncompressed as of 05/19/2018
-     * @return list of paths where data feed files were downloaded and extracted
+     * @return list of paths of extracted data feed files
      */
     public List<String> downloadAndExtractAll() {
         List<String> filePaths = new LinkedList<>();
@@ -151,17 +151,17 @@ public class Downloader {
         return filePath;
     }
 
-    public String extractSpecific(String filePathYear) {
+    public String extractSpecific(String filePath) {
 
-        logger.debug("Extracting data feed file: " + filePathYear);
+        logger.debug("Extracting data feed file: " + filePath);
 
-        if (StringUtils.isBlank(filePathYear)) {
+        if (StringUtils.isBlank(filePath)) {
             throw new IllegalArgumentException("File path year of data feed was blank or null.");
         }
 
         byte[] buffer = new byte[1024];
 
-        try (ZipInputStream zis = new ZipInputStream((new FileInputStream(filePathYear)))) {
+        try (ZipInputStream zis = new ZipInputStream((new FileInputStream(filePath)))) {
             ZipEntry zipEntry;
             while ((zipEntry = zis.getNextEntry()) != null) {
 
@@ -179,7 +179,7 @@ public class Downloader {
                 }
             }
         } catch (IOException e) {
-            logger.error("Error extracting data feed file path " + filePathYear);
+            logger.error("Error extracting data feed file path " + filePath);
         }
 
         // Path to single file in zip file should have already been returned. Should not be here.
