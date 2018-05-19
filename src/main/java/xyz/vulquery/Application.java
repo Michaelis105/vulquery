@@ -8,13 +8,13 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import javax.annotation.PostConstruct;
-import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 
 import org.springframework.boot.system.ApplicationHome;
 import xyz.vulquery.dao.DependencyDAO;
 import xyz.vulquery.datafeed.DatafeedService;
+import xyz.vulquery.datafeed.Downloader;
 import xyz.vulquery.util.StringUtils;
 
 /**
@@ -34,8 +34,11 @@ public class Application {
     @Autowired
     private DependencyDAO dependencyDAO; // Use for initialization only.
 
+    @Autowired
+    private Downloader downloader; // Use for initialization only.
+
     /**
-     * Continue initialization after SpringBoot has started.
+     * Continue initialization after Spring Boot has started.
      */
     @PostConstruct
     private void init() throws Exception {
@@ -52,7 +55,7 @@ public class Application {
      * @throws ClassNotFoundException internal error in dependencies
      * @throws SQLException connection error to database
      */
-    private void initDataStore(String url) throws ClassNotFoundException, SQLException {
+    private void initDataStore(String url) {
         dependencyDAO.init(url);
     }
 
@@ -61,21 +64,7 @@ public class Application {
      * @param path Absolute file path where download directory will be stored
      */
     private void initDataFeedDownloadDirectory(String path) throws IOException {
-        if (StringUtils.isBlank(path)) {
-            throw new IllegalArgumentException("Download directory path is null or empty.");
-        }
-        logger.debug("Download directory: " + path);
-        File downloadDir = new File(path);
-        if (!downloadDir.exists()) {
-            logger.debug("Download directory does not exist, creating...");
-            if (!downloadDir.mkdirs()) {
-                throw new IOException("Error creating download directory.");
-            } else {
-                logger.debug("Download directory created.");
-            }
-        } else {
-            logger.debug("Download directory already exists.");
-        }
+        downloader.init(path);
     }
 
     public static void main(String[] args) {

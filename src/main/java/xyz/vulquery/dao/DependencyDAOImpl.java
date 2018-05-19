@@ -13,6 +13,7 @@ import xyz.vulquery.util.StringUtils;
 
 import javax.sql.DataSource;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -67,7 +68,8 @@ public class DependencyDAOImpl implements DependencyDAO {
         StringBuffer urlSB = new StringBuffer();
         urlSB.append("jdbc:sqlite:");
         urlSB.append(url);
-        urlSB.append("/vulquery.db");
+        urlSB.append(File.separator);
+        urlSB.append("vulquery.db");
 
         driverManagerDataSourcedataSource.setUrl(urlSB.toString());
 
