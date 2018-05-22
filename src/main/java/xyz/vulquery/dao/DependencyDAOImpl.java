@@ -29,28 +29,43 @@ public class DependencyDAOImpl implements DependencyDAO {
     private JdbcTemplate jdbcTemplate;
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
+    private static final String DATE_FORMAT = "MM/dd/yyyy HH:mm:ss";
+
     private static final String DATABASE_DRIVER_CLASS_NAME = "org.sqlite.JDBC";
 
-    // TODO: Not final table
-    private static final String CREATE_DEPENDENCY_TABLE_SQL = "CREATE TABLE IF NOT EXISTS DEPENDENCY " +
-            "(GROUPID       TEXT    NOT NULL, " +
-            " ARTIFACTID    TEXT    NOT NULL, " +
-            " VERSION       TEXT    NOT NULL)";
-
-    private static final String CREATE_LAST_SYNC_DATE_TABLE_SQL = "CREATE TABLE IF NOT EXISTS LASTSYNCDATE" +
-            "(LASTSYNCDATE  TEXT    NOT NULL)";
-
-    private static final String INIT_LAST_SYNC_DATE_TABLE_SQL = "INSERT INTO LASTSYNCDATE VALUES (?)";
-
-    private static final String DELETE_LAST_SYNC_DATE_TABLE_SQL = "DELETE FROM LASTSYNCDATE";
-
-    private static final String UPDATE_LAST_SYNC_DATE_SQL = "UPDATE LASTSYNCDATE SET LASTSYNCDATE = :lastsyncdate";
-
+    private static final String DEPENDENCY_TABLE_NAME = "DEPENDENCY";
+    private static final String VULNERABILITY_TABLE_NAME = "VULNERABILITY";
+    private static final String LASTSYNCDATE_TABLE_NAME = "LASTSYNCDATE";
     private static final String LASTSYNCDATE_COL_NAME = "LASTSYNCDATE";
 
-    private static final String GET_LAST_SYNC_DATE_SQL = "SELECT " + LASTSYNCDATE_COL_NAME + " FROM LASTSYNCDATE";
+    // TODO: Not final table
+    private static final String CREATE_DEPENDENCY_TABLE_SQL = "CREATE TABLE IF NOT EXISTS " + DEPENDENCY_TABLE_NAME +
+            "(DEPENDENCYID  INTEGER NOT NULL, " +
+            " GROUPID       TEXT    NOT NULL, " +
+            " ARTIFACTID    TEXT    NOT NULL, " +
+            " VERSION       TEXT    NOT NULL, " +
+            " BASESCORE     REAL    NOT NULL) ";
 
-    private static final String DATE_FORMAT = "MM/dd/yyyy HH:mm:ss";
+
+    private static final String CREATE_VULNERABILITY_TABLE_SQL = "CREATE TABLE IF NOT EXISTS " + VULNERABILITY_TABLE_NAME +
+            "(VULNERABILITYID   INTEGER    NOT NULL, " +
+            " DEPENDENCYID      INTEGER    NOT NULL, " +
+            " CVEID             TEXT       NOT NULL)";
+
+    // DEPENDENCYID IS A FOREIGN KEY CONSTRAINT
+
+    private static final String CREATE_LAST_SYNC_DATE_TABLE_SQL = "CREATE TABLE IF NOT EXISTS " + LASTSYNCDATE_TABLE_NAME +
+            "(LASTSYNCDATE  TEXT    NOT NULL)";
+
+    private static final String INIT_LAST_SYNC_DATE_TABLE_SQL = "INSERT INTO " + LASTSYNCDATE_TABLE_NAME + " VALUES (?)"; // TODO: I forgot why this isn't named params.
+
+    private static final String DELETE_LAST_SYNC_DATE_TABLE_SQL = "DELETE FROM " + LASTSYNCDATE_TABLE_NAME;
+
+    private static final String UPDATE_LAST_SYNC_DATE_SQL = "UPDATE " + LASTSYNCDATE_TABLE_NAME + " SET " + LASTSYNCDATE_COL_NAME + " = :lastsyncdate";
+
+    private static final String GET_LAST_SYNC_DATE_SQL = "SELECT " + LASTSYNCDATE_COL_NAME + " FROM " + LASTSYNCDATE_TABLE_NAME;
+
+    private static final String ADD_DEPENDENCY_SQL = "INSERT INTO " + DEPENDENCY_TABLE_NAME + " VALUES (:dependencyid, :groupid, :artifactid, :versionid, :basescore)";
 
     /**
      * Initializes database and sets data source.
@@ -76,11 +91,13 @@ public class DependencyDAOImpl implements DependencyDAO {
         dataSource = driverManagerDataSourcedataSource;
         jdbcTemplate = new JdbcTemplate(dataSource);
         namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
-
         jdbcTemplate.execute(CREATE_DEPENDENCY_TABLE_SQL);
+        jdbcTemplate.execute(CREATE_VULNERABILITY_TABLE_SQL);
         jdbcTemplate.execute(CREATE_LAST_SYNC_DATE_TABLE_SQL);
 
         jdbcTemplate.update(DELETE_LAST_SYNC_DATE_TABLE_SQL);
+
+        // Caller should update last sync date and not leave placeholder
         jdbcTemplate.update(INIT_LAST_SYNC_DATE_TABLE_SQL, "placeholder");
     }
 
@@ -89,8 +106,19 @@ public class DependencyDAOImpl implements DependencyDAO {
      * Adds dependency to database. If it already exists, then update.
      */
     @Override
-    public void addDependency() {
+    public void addDependency(Dependency dependency) {
+        if (dependency == null) {
+            throw new IllegalArgumentException("Dependency was null.");
+        }
 
+        Map<String, Object> syncParam = new HashMap<String, Object>(5);
+        syncParam.put("dependencyid", 1); // 1 is placeholder, use sequence instead.
+        syncParam.put("groupid", dependency.getGroupId());
+        syncParam.put("artifactid", dependency.getArtifactId());
+        syncParam.put("versionid", dependency.getVersion());
+        syncParam.put("basescore", dependency.getAverageBaseScore());
+
+        namedParameterJdbcTemplate.update(ADD_DEPENDENCY_SQL, syncParam);
     }
 
     /**
@@ -107,18 +135,14 @@ public class DependencyDAOImpl implements DependencyDAO {
      * Avoid dangling delete.
      */
     @Override
-    public void deleteDependency() {
-
-    }
+    public void deleteDependency() { }
 
     /**
      * Cleanses database of all dependency data. Ideal when force updating all dependencies from empty data state.
      * Avoid dangling cleansing.
      */
     @Override
-    public void removeAll() {
-
-    }
+    public void removeAll() { }
 
     /**
      * Updates sync date to database.

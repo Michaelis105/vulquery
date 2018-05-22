@@ -12,7 +12,7 @@ public interface DependencyDAO {
     /**
      * Adds dependency to data storage. If it already exists, then update.
      */
-    void addDependency();
+    void addDependency(Dependency dependency);
 
     /**
      * Retrieves dependency information from data storage.
