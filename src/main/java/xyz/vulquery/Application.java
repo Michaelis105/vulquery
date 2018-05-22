@@ -9,7 +9,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.sql.SQLException;
 
 import org.springframework.boot.system.ApplicationHome;
 import xyz.vulquery.dao.DependencyDAO;
@@ -29,13 +28,17 @@ public class Application {
     private ConfigProperties prop;
 
     @Autowired
-    private DatafeedService dataFeedService; // Use for initialization only.
+    private DatafeedService datafeedService; // Use for initialization only.
 
     @Autowired
     private DependencyDAO dependencyDAO; // Use for initialization only.
 
     @Autowired
     private Downloader downloader; // Use for initialization only.
+
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
 
     /**
      * Continue initialization after Spring Boot has started.
@@ -46,14 +49,12 @@ public class Application {
         logger.info(defaultPath);
         initDataStore(StringUtils.isBlank(prop.getDbPath()) ? defaultPath : prop.getDbPath());
         initDataFeedDownloadDirectory(StringUtils.isBlank(prop.getDataFeedPath()) ? defaultPath : prop.getDataFeedPath());
-        dataFeedService.fullSync();
+        datafeedService.fullSync();
     }
 
     /**
      * Creates database if it does not exists.
      * @param url Absolute file path where SQLITE database file will be stored
-     * @throws ClassNotFoundException internal error in dependencies
-     * @throws SQLException connection error to database
      */
     private void initDataStore(String url) {
         dependencyDAO.init(url);
@@ -65,10 +66,6 @@ public class Application {
      */
     private void initDataFeedDownloadDirectory(String path) throws IOException {
         downloader.init(path);
-    }
-
-    public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
     }
 
 }

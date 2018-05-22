@@ -6,7 +6,13 @@ public class Dependency {
     private String artifactId;
     private String version;
 
-    public Dependency() {}
+    private double averageBaseScore;
+    private int vulnerabilityCount;
+
+    public Dependency() {
+        averageBaseScore = 0.0;
+        vulnerabilityCount = 0;
+    }
 
     public void setGroupId(String groupId) {
         this.groupId = groupId;
@@ -30,6 +36,28 @@ public class Dependency {
 
     public String getVersion() {
         return version;
+    }
+
+    // Use addBaseScore() instead.
+    public void setAverageBaseScore(double averageBaseScore) { this.averageBaseScore = averageBaseScore; }
+
+    public double getAverageBaseScore() { return averageBaseScore; }
+
+    public void addBaseScore(double baseScore) {
+        if (baseScore < 0) {
+            throw new IllegalArgumentException("Cannot add negative additive base score");
+        }
+        this.averageBaseScore = (averageBaseScore + baseScore) / (++vulnerabilityCount);
+    }
+
+    public String getFullName() {
+        StringBuffer sb = new StringBuffer();
+        sb.append(groupId);
+        sb.append(":");
+        sb.append(artifactId);
+        sb.append(":");
+        sb.append(version);
+        return sb.toString();
     }
 
     @Override
